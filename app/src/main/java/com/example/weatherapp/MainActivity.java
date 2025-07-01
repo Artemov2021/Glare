@@ -17,6 +17,8 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.weatherapp.ui.BlurInitializer;
+
 import java.lang.annotation.Target;
 
 import eightbitlab.com.blurview.BlurView;
@@ -27,59 +29,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setStatusBarsTransparent();
 
-
-        BlurView blurViewToday = findViewById(R.id.weatherTodayBackground);
-        BlurView blurViewWeek = findViewById(R.id.weatherWeekBackground);
-        BlurView blurWeatherInfo = findViewById(R.id.weatherInfo);
-
-        ViewGroup rootLayout = findViewById(R.id.blurTarget);
-        Drawable windowBackground = getWindow().getDecorView().getBackground();
-
-        float cornerRadiusDp = 30f;
-        int cornerRadiusPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, cornerRadiusDp, getResources().getDisplayMetrics());
-
-// Setup first blur view
-        blurViewToday.setupWith(rootLayout)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(20f);
-
-        blurViewToday.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadiusPx);
-            }
-        });
-        blurViewToday.setClipToOutline(true);
-
-// Setup second blur view
-        blurViewWeek.setupWith(rootLayout)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(20f);
-
-        blurViewWeek.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadiusPx);
-            }
-        });
-        blurViewWeek.setClipToOutline(true);
-
-        blurWeatherInfo.setupWith(rootLayout)
-                .setFrameClearDrawable(windowBackground)
-                .setBlurRadius(20f);
-
-        blurWeatherInfo.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadiusPx);
-            }
-        });
-        blurWeatherInfo.setClipToOutline(true);
+        initialize();
 
     }
+
+
+    private void initialize() {
+        setStatusBarsTransparent();
+        setBluredInfo();
+    }
+
 
     private void setStatusBarsTransparent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -92,5 +52,19 @@ public class MainActivity extends AppCompatActivity {
             window.setStatusBarColor(Color.TRANSPARENT);
             window.setNavigationBarColor(Color.TRANSPARENT);
         }
+    }
+    private void setBluredInfo() {
+        BlurView blurView1 = findViewById(R.id.weatherInfo);
+        BlurView blurView2 = findViewById(R.id.weatherTodayBackground);
+        BlurView blurView3 = findViewById(R.id.weatherWeekBackground);
+        ViewGroup rootLayout = findViewById(R.id.blurTarget);
+
+        BlurInitializer.initBlurView(this, blurView1, rootLayout, 20f, 30f);
+        BlurInitializer.initBlurView(this, blurView2, rootLayout, 20f, 30f);
+        BlurInitializer.initBlurView(this, blurView3, rootLayout, 20f, 30f);
+
+        BlurInitializer.setStroke(blurView1, 0.4f, Color.WHITE, 0.5f);
+        BlurInitializer.setStroke(blurView2, 0.4f, Color.WHITE, 0.5f);
+        BlurInitializer.setStroke(blurView3, 0.4f, Color.WHITE, 0.5f);
     }
 }

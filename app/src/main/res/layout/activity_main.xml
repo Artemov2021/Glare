@@ -32,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- "current location" -->
             <TextView
                 android:id="@+id/currentLocationTitle"
                 android:layout_width="152dp"
@@ -45,6 +46,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- current location symbol -->
             <ImageView
                 android:id="@+id/currentLocationTitleSymbol"
                 android:layout_width="19dp"
@@ -56,6 +58,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- TEMPERATURE -->
             <TextView
                 android:id="@+id/gradus"
                 android:layout_width="150dp"
@@ -69,19 +72,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Sunny,Cloudy,Rainy etc -->
             <TextView
                 android:id="@+id/weatherStatusTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="158dp"
                 android:layout_marginTop="240dp"
-                android:text="Sunny"
+                android:text="Weather Status"
                 android:textColor="#FFFFFF"
                 android:textSize="23sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Weather status symbol -->
             <ImageView
                 android:id="@+id/weatherStatusTitleSymbol"
                 android:layout_width="21dp"
@@ -93,18 +98,47 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
-
-
-            <eightbitlab.com.blurview.BlurView
-                android:id="@+id/weatherInfo"
+            <!-- Weather Info -->
+            <FrameLayout
+                android:id="@+id/weatherInfoContainer"
                 android:layout_width="376dp"
                 android:layout_height="197dp"
                 android:layout_marginTop="480dp"
                 android:layout_gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Blur background -->
+                <eightbitlab.com.blurview.BlurView
+                    android:id="@+id/weatherInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- Air Quality Index:  -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Air Quality Index:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="24dp" />
+
+                <TextView
+                    android:id="@+id/weatherAirQualityStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginStart="292dp" />
+
+            </FrameLayout>
+
 
             <eightbitlab.com.blurview.BlurView
                 android:id="@+id/weatherTodayBackground"
@@ -114,7 +148,7 @@
                 android:layout_gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weatherInfo"/>
+                app:layout_constraintTop_toBottomOf="@id/weatherInfoContainer"/>
 
             <eightbitlab.com.blurview.BlurView
                 android:id="@+id/weatherWeekBackground"
