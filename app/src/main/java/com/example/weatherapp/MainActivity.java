@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         BlurView blurView3 = findViewById(R.id.weatherWeekBackground);
         ViewGroup rootLayout = findViewById(R.id.blurTarget);
 
-        BlurInitializer.initBlurView(this, blurView1, rootLayout, 20f, 30f);
-        BlurInitializer.initBlurView(this, blurView2, rootLayout, 20f, 30f);
+        BlurInitializer.initBlurView(this, blurView1, rootLayout, 40f, 23f);
+        BlurInitializer.initBlurView(this, blurView2, rootLayout, 40f, 23f);
         BlurInitializer.initBlurView(this, blurView3, rootLayout, 20f, 30f);
 
         BlurInitializer.setStroke(blurView1, 0.4f, Color.WHITE, 0.5f);

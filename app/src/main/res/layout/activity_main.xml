@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/blurTarget"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/blurTarget"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,25 +14,21 @@
         android:scaleType="centerCrop"
         android:src="@drawable/sunny_morning_background" />
 
-
     <!-- 🔹 Scrollable content over background -->
     <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:scrollbars="none"
-        android:overScrollMode="never">
+        android:overScrollMode="never"
+        android:layout_marginBottom="20dp">
 
-        <!-- ConstraintLayout inside ScrollView -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/blurRoot"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- "current location" -->
+            <!-- Current location title -->
             <TextView
                 android:id="@+id/currentLocationTitle"
                 android:layout_width="152dp"
@@ -45,8 +41,7 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- current location symbol -->
+            <!-- Current location symbol -->
             <ImageView
                 android:id="@+id/currentLocationTitleSymbol"
                 android:layout_width="19dp"
@@ -58,11 +53,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- TEMPERATURE -->
+            <!-- Temperature -->
             <TextView
                 android:id="@+id/gradus"
                 android:layout_width="150dp"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="138dp"
                 android:layout_marginTop="132dp"
                 android:text="18°"
@@ -71,8 +66,7 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Sunny,Cloudy,Rainy etc -->
+            <!-- Weather Status -->
             <TextView
                 android:id="@+id/weatherStatusTitle"
                 android:layout_width="wrap_content"
@@ -85,8 +79,7 @@
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <!-- Weather status symbol -->
+            <!-- Weather Status Symbol -->
             <ImageView
                 android:id="@+id/weatherStatusTitleSymbol"
                 android:layout_width="21dp"
@@ -98,30 +91,29 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Weather Info -->
+            <!-- Weather Info Container -->
             <FrameLayout
                 android:id="@+id/weatherInfoContainer"
                 android:layout_width="376dp"
-                android:layout_height="197dp"
+                android:layout_height="111dp"
                 android:layout_marginTop="480dp"
                 android:layout_gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <!-- Blur background -->
                 <eightbitlab.com.blurview.BlurView
                     android:id="@+id/weatherInfo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <!-- Air Quality Index:  -->
+                <!-- Air Quality -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Air Quality Index:"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="24dp" />
@@ -132,70 +124,189 @@
                     android:layout_height="wrap_content"
                     android:text="Status"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginTop="22dp"
-                    android:layout_marginStart="292dp" />
+                    android:layout_marginEnd="31dp"
+                    android:layout_gravity="end" />
+
+                <!-- Humidity -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Humidity:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="61dp"
+                    android:layout_marginStart="24dp" />
+
+                <TextView
+                    android:id="@+id/weatherHumidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="23%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="62dp"
+                    android:layout_marginEnd="52dp"
+                    android:layout_gravity="end" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/humidity_water_drop_symbol"
+                    android:layout_marginTop="64dp"
+                    android:layout_marginStart="330dp" />
+
+            </FrameLayout>
+            <!-- Weather Today Container -->
+            <FrameLayout
+                android:id="@+id/weatherTodayContainer"
+                android:layout_width="376dp"
+                android:layout_height="192dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weatherInfoContainer">
+
+                <eightbitlab.com.blurview.BlurView
+                    android:id="@+id/weatherTodayBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- "now" -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="now"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginStart="32dp" />
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/sunny_weather_symbol"
+                    android:layout_marginTop="70dp"
+                    android:layout_marginStart="33dp" />
+
+                <TextView
+                    android:id="@+id/weatherNow"
+                    android:layout_width="39dp"
+                    android:layout_height="wrap_content"
+                    android:text="-18°"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="135dp"
+                    android:layout_marginStart="30dp" />
+
+                <!-- e.g. 23:00 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="23:00"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginStart="112dp" />
+
+                <ImageView
+                    android:layout_width="51dp"
+                    android:layout_height="51dp"
+                    android:src="@drawable/cloudy_weather_symbol"
+                    android:layout_marginTop="61dp"
+                    android:layout_marginStart="110dp" />
+
+                <TextView
+                    android:layout_width="39dp"
+                    android:layout_height="wrap_content"
+                    android:text="-18°"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="135dp"
+                    android:layout_marginStart="114dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginStart="203dp" />
+
+                <ImageView
+                    android:layout_width="54dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/rainy_weather_symbol"
+                    android:layout_marginTop="61dp"
+                    android:layout_marginStart="199dp" />
+
+                <TextView
+                    android:layout_width="39dp"
+                    android:layout_height="wrap_content"
+                    android:text="+20°"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="135dp"
+                    android:layout_marginStart="210dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:01"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_gravity="end"/>
+
+                <ImageView
+                    android:layout_width="54dp"
+                    android:layout_height="68dp"
+                    android:src="@drawable/thunder_symbol"
+                    android:layout_marginTop="61dp"
+                    android:layout_marginStart="293dp" />
+
+                <TextView
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:text="8°"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="135dp"
+                    android:layout_marginStart="310dp" />
+
 
             </FrameLayout>
 
-
-            <eightbitlab.com.blurview.BlurView
-                android:id="@+id/weatherTodayBackground"
-                android:layout_width="376dp"
-                android:layout_height="199dp"
-                android:layout_marginTop="15dp"
-                android:layout_gravity="center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weatherInfoContainer"/>
-
+            <!-- Weather Week -->
             <eightbitlab.com.blurview.BlurView
                 android:id="@+id/weatherWeekBackground"
                 android:layout_width="376dp"
                 android:layout_height="234dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:layout_gravity="center"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/weatherTodayBackground"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-
-
-
+                app:layout_constraintTop_toBottomOf="@id/weatherTodayContainer"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

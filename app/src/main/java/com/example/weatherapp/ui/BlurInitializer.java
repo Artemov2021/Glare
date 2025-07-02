@@ -42,7 +42,7 @@ public class BlurInitializer {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(Color.TRANSPARENT); // keep BlurView content visible
         drawable.setStroke(strokeWidthPx, adjustAlpha(strokeColor, opacity));
-        drawable.setCornerRadius(30 * density); // match your blurView rounding
+        drawable.setCornerRadius(23 * density); // match your blurView rounding
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackground(drawable);
