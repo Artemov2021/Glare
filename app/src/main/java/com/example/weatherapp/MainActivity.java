@@ -1,5 +1,6 @@
 package com.example.weatherapp;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.RenderEffect;
@@ -7,64 +8,91 @@ import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.Window;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.weatherapp.ui.BlurInitializer;
+import com.example.weatherapp.ui.WeatherUI;
 
-import java.lang.annotation.Target;
-
-import eightbitlab.com.blurview.BlurView;
-import eightbitlab.com.blurview.RenderScriptBlur;
 
 public class MainActivity extends AppCompatActivity {
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initialize();
+        WeatherUI weatherUI = new WeatherUI(this);
+
+        weatherUI.setAppropriateUIValues();
+        setPullToRefreshListener();
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void setPullToRefreshListener() {
+        ScrollView scrollView = findViewById(R.id.scrollView);
 
-    private void initialize() {
-        setStatusBarsTransparent();
-        setBluredInfo();
+        final float maxPullDistance = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics()); // 60dp in pixels
+        scrollView.setOnTouchListener(new View.OnTouchListener() {
+            float startY = 0f;
+            boolean dragging = false;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startY = event.getY();
+                        dragging = scrollView.getScrollY() == 0;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        if (!dragging) break;
+
+                        float currentY = event.getY();
+                        float deltaY = currentY - startY;
+
+                        if (deltaY > 0) {  // dragging down only
+                            float translationY = Math.min(deltaY / 2, maxPullDistance); // dampen drag by half
+                            scrollView.setTranslationY(translationY);
+                            return true;  // consume event, prevent scrollView from scrolling
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        if (dragging) {
+                            // Animate back to 0 translationY smoothly
+                            scrollView.animate()
+                                    .translationY(0)
+                                    .setDuration(300)
+                                    .setInterpolator(new DecelerateInterpolator())
+                                    .start();
+
+                            dragging = false;
+                            return true;
+                        }
+                        break;
+                }
+                return false;  // let ScrollView handle other cases normally
+            }
+        });
     }
 
-
-    private void setStatusBarsTransparent() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  // for navigation bar
-            );
-            window.setStatusBarColor(Color.TRANSPARENT);
-            window.setNavigationBarColor(Color.TRANSPARENT);
-        }
-    }
-    private void setBluredInfo() {
-        BlurView blurView1 = findViewById(R.id.weatherInfo);
-        BlurView blurView2 = findViewById(R.id.weatherTodayBackground);
-        BlurView blurView3 = findViewById(R.id.weatherWeekBackground);
-        ViewGroup rootLayout = findViewById(R.id.blurTarget);
-
-        BlurInitializer.initBlurView(this, blurView1, rootLayout, 40f, 23f);
-        BlurInitializer.initBlurView(this, blurView2, rootLayout, 40f, 23f);
-        BlurInitializer.initBlurView(this, blurView3, rootLayout, 20f, 30f);
-
-        BlurInitializer.setStroke(blurView1, 0.4f, Color.WHITE, 0.5f);
-        BlurInitializer.setStroke(blurView2, 0.4f, Color.WHITE, 0.5f);
-        BlurInitializer.setStroke(blurView3, 0.4f, Color.WHITE, 0.5f);
-    }
 }
