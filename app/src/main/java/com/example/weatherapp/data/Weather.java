@@ -45,7 +45,6 @@ public class Weather {
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 
         fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            Log.d("Test",location.toString());
             if (location != null) {
                 double lat = location.getLatitude();
                 double lon = location.getLongitude();

@@ -41,7 +41,8 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" />
             <!-- Current location symbol -->
             <ImageView
                 android:id="@+id/currentLocationTitleSymbol"
@@ -52,45 +53,49 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/current_location_title_symbol"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" />
 
             <!-- Temperature -->
             <TextView
                 android:id="@+id/currentTemperature"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="140dp"
+                android:layout_marginStart="143dp"
                 android:layout_marginTop="132dp"
                 android:text="18°"
                 android:textColor="#FFFFFF"
                 android:textSize="90sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" />
             <!-- Weather Status -->
             <TextView
                 android:id="@+id/weatherStatusTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="155dp"
+                android:layout_marginStart="153dp"
                 android:layout_marginTop="240dp"
                 android:text="Sunny"
                 android:textColor="#FFFFFF"
                 android:textSize="23sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" />
             <!-- Weather Status Symbol -->
             <ImageView
                 android:id="@+id/weatherStatusTitleSymbol"
                 android:layout_width="21dp"
                 android:layout_height="21dp"
-                android:layout_marginStart="230dp"
+                android:layout_marginStart="228dp"
                 android:layout_marginTop="248dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/sunny_weather_status_title_symbol"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" />
 
             <!-- Weather Info -->
             <FrameLayout
@@ -101,7 +106,8 @@
                 android:layout_gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible" >
 
                 <eightbitlab.com.blurview.BlurView
                     android:id="@+id/weatherInfo"
@@ -170,7 +176,8 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintTop_toBottomOf="@id/weatherInfoContainer"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="invisible" >
 
                 <!-- Background BlurView -->
                 <eightbitlab.com.blurview.BlurView
@@ -569,7 +576,8 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintTop_toBottomOf="@id/weatherTodayContainer"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="invisible" >
 
                 <!-- Background BlurView -->
                 <eightbitlab.com.blurview.BlurView
@@ -949,7 +957,99 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
+    <!-- 🔹 No Permission Message Overlay -->
+    <FrameLayout
+        android:id="@+id/permissionFrameLayout"
+        android:layout_width="336dp"
+        android:layout_height="177dp"
+        android:layout_marginTop="340dp"
+        android:layout_gravity="top|center_horizontal"
+        android:visibility="invisible" >
 
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/permissionBlurView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- To show you weather,... -->
+        <TextView
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="To show you weather, we need your location"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp" >
+
+        </TextView>
+
+        <!-- Button with blur background -->
+        <ImageView
+            android:id="@+id/permissionButton"
+            android:layout_width="310dp"
+            android:layout_height="53dp"
+            android:src="@drawable/permission_button"
+            android:contentDescription="Custom Button"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="111dp"
+            android:clickable="true"
+            android:focusable="true" >
+
+        </ImageView>
+
+
+
+
+    </FrameLayout>
+
+    <!-- 🔹 No Intenet Message Overlay -->
+    <FrameLayout
+        android:id="@+id/noInternetFrameLayout"
+        android:layout_width="336dp"
+        android:layout_height="177dp"
+        android:layout_marginTop="340dp"
+        android:layout_gravity="top|center_horizontal"
+        android:visibility="invisible" >
+
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/noInternetBlurView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- To show you weather,... -->
+        <TextView
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="It looks like you're not connected to the internet"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp" >
+
+        </TextView>
+
+        <!-- Button with blur background -->
+        <ImageView
+            android:id="@+id/tryAgainButton"
+            android:layout_width="310dp"
+            android:layout_height="53dp"
+            android:src="@drawable/try_again_button"
+            android:contentDescription="Custom Button"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="111dp"
+            android:clickable="true"
+            android:focusable="true" >
+
+        </ImageView>
+
+
+
+
+    </FrameLayout>
 
 
 
