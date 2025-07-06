@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.weatherapp.ui.BlurInitializer;
 import com.example.weatherapp.ui.WeatherUI;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,8 +44,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidThreeTen.init(this);
         setContentView(R.layout.activity_main);
 
+        weatherUI = new WeatherUI(this);
+        weatherUI.setPermissionSettingsLauncher(permissionSettingsLauncher);
+        weatherUI.setStatusBarsTransparent();
+        weatherUI.checkPermissionsAndSetAppropriateUI();
+
+        setPermissionWindowResultListener();
+    }
+
+
+
+    private void setPermissionWindowResultListener() {
         // Set up launcher
         permissionSettingsLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -55,14 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
-
-        // Set up WeatherUI and pass the launcher
-        weatherUI = new WeatherUI(this);
-        weatherUI.setPermissionSettingsLauncher(permissionSettingsLauncher);
-        weatherUI.setStatusBarsTransparent();
-        weatherUI.checkPermissionsAndSetAppropriateUI();
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

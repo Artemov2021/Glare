@@ -6,7 +6,9 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -41,14 +43,18 @@ import androidx.core.content.ContextCompat;
 import com.example.weatherapp.R;
 import com.example.weatherapp.data.Weather;
 
+import org.threeten.bp.LocalTime;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import eightbitlab.com.blurview.BlurView;
 
 public class WeatherUI {
     private static final int PERMISSIONS_REQUEST_CODE = 123;
-    private static final int REQUEST_PERMISSION_SETTINGS = 1234;
+    private ObjectAnimator rotationAnimator;
     private ActivityResultLauncher<Intent> permissionSettingsLauncher;
     private static final String[] REQUIRED_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -58,9 +64,26 @@ public class WeatherUI {
     private Activity activity;
     private Window window;
 
+
     public WeatherUI(Activity activity) {
         this.activity = activity;
         this.window = activity.getWindow();
+    }
+
+
+    public void setPermissionSettingsLauncher(ActivityResultLauncher<Intent> launcher) {
+        this.permissionSettingsLauncher = launcher;
+    }
+    public void setStatusBarsTransparent() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  // for navigation bar
+            );
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.setNavigationBarColor(Color.TRANSPARENT);
+        }
     }
     public void checkPermissionsAndSetAppropriateUI() {
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -76,14 +99,23 @@ public class WeatherUI {
         }
     }
     public void checkForInternetAndSetAppropriateUI() {
-        FrameLayout permissionFrameLayout = activity.findViewById(R.id.permissionFrameLayout);
-        permissionFrameLayout.setVisibility(View.INVISIBLE);
+        hidePermissionUI();
 
         if (!isInternetAvailable()) {
             setNoInternetUI();
         } else {
             setAppropriateUI();
         }
+    }
+
+
+    private void hidePermissionUI() {
+        FrameLayout permissionFrameLayout = activity.findViewById(R.id.permissionFrameLayout);
+        permissionFrameLayout.setVisibility(View.INVISIBLE);
+    }
+    private void hideNoInternetUI() {
+        FrameLayout noInternetFrameLayout = activity.findViewById(R.id.noInternetFrameLayout);
+        noInternetFrameLayout.setVisibility(View.INVISIBLE);
     }
     private void setNoInternetUI() {
         FrameLayout noInternetFrameLayout = activity.findViewById(R.id.noInternetFrameLayout);
@@ -98,7 +130,10 @@ public class WeatherUI {
         setTryAgainButtonPressedEffect(tryAgainButton,noInternetFrameLayout);
     }
     private void setAppropriateUI() {
+        setPullToRefreshListener();
+        setBluredInfo();
 
+        setWeatherValues();
     }
     public void setNoPermissionsUI() {
         // set frame layout blur effect, visibility -> true
@@ -113,6 +148,8 @@ public class WeatherUI {
         permissionFrameLayout.setVisibility(View.VISIBLE);
         setPermissionButtonPressedEffect(permissionButton);
     }
+
+
     @SuppressLint("ClickableViewAccessibility")
     private void setPermissionButtonPressedEffect(ImageView permissionButton) {
         permissionButton.setOnTouchListener(new View.OnTouchListener() {
@@ -170,6 +207,8 @@ public class WeatherUI {
             }
         });
     }
+
+
     private void addReconnectingAnimation(FrameLayout noInternetFramelayout) {
         // Create ImageView and set image
         ImageView connectionSymbol = new ImageView(activity);
@@ -197,14 +236,32 @@ public class WeatherUI {
         noInternetFramelayout.addView(connectionSymbol);
 
         // Rotate the connectionSymbol infinitely
-        ObjectAnimator rotation = ObjectAnimator.ofFloat(connectionSymbol, "rotation", 0f, 360f);
-        rotation.setDuration(1000); // 1 second for one full rotation
-        rotation.setInterpolator(new LinearInterpolator());
-        rotation.setRepeatCount(ObjectAnimator.INFINITE);
-        rotation.start();
+        rotationAnimator = ObjectAnimator.ofFloat(connectionSymbol, "rotation", 0f, 360f);
+        rotationAnimator.setDuration(1000); // 1 second for one full rotation
+        rotationAnimator.setInterpolator(new LinearInterpolator());
+        rotationAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+        rotationAnimator.start();
     }
     private void tryReconnect() {
-
+        if (isInternetAvailable()) {
+            stopReconnectingAnimation();
+            setAppropriateUI();
+            hideNoInternetUI();
+        } else {
+            // Optionally, use a handler to retry after a delay
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    tryReconnect(); // Try again after delay
+                }
+            }, 2000); // retry every 2 second
+        }
+    }
+    private void stopReconnectingAnimation() {
+        if (rotationAnimator != null && rotationAnimator.isRunning()) {
+            rotationAnimator.cancel();
+            rotationAnimator = null;
+        }
     }
     private void openPermissionSettings() {
         Intent intent;
@@ -222,9 +279,8 @@ public class WeatherUI {
             activity.startActivity(intent); // fallback
         }
     }
-    public void setPermissionSettingsLauncher(ActivityResultLauncher<Intent> launcher) {
-        this.permissionSettingsLauncher = launcher;
-    }
+
+
     public boolean isInternetAvailable() {
         ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(activity.CONNECTIVITY_SERVICE);
 
@@ -244,21 +300,6 @@ public class WeatherUI {
             return activeNetwork != null && activeNetwork.isConnected();
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -325,47 +366,482 @@ public class WeatherUI {
         BlurInitializer.setStroke(blurView2, 0.4f, Color.WHITE, 0.5f);
         BlurInitializer.setStroke(blurView3, 0.4f, Color.WHITE, 0.5f);
     }
-    public void setStatusBarsTransparent() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION  // for navigation bar
-            );
-            window.setStatusBarColor(Color.TRANSPARENT);
-            window.setNavigationBarColor(Color.TRANSPARENT);
-        }
-    }
-    private void requestPermissions() {
-        List<String> missingPermissions = new ArrayList<>();
-
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                missingPermissions.add(permission);
-            }
-        }
-
-        if (!missingPermissions.isEmpty()) {
-            // Request only the missing permissions
-            ActivityCompat.requestPermissions(activity,
-                    missingPermissions.toArray(new String[0]),
-                    PERMISSIONS_REQUEST_CODE);
-        }
-    }
-    private void setCurrentTemperature() {
-        TextView currentTemperature = activity.findViewById(R.id.currentTemperature);
-        Weather.getCurrentTemperature(activity, activity, new Weather.TemperatureCallback() {
+    private void setWeatherValues() {
+        Weather.setCurrentWeatherValues(activity, activity, new Weather.WeatherCallback() {
             @Override
             public void onTemperatureReady(int temperature) {
-                currentTemperature.setText(temperature+"°");
-                Log.e("WeatherApp",temperature+"°");
+                setCurrentTemperature(temperature);
             }
 
             @Override
+            public void onWeatherStatusReady(String weatherStatus) {
+                setAppropriateWeatherStatus(weatherStatus);
+            }
+
+            @Override
+            public void onAirQualityReady(String quality) {
+                setAirQuality(quality);
+            }
+
+            @Override
+            public void onHumidityReady(int humidity) {
+                setHumidity(humidity);
+            }
+
+            @Override
+            public void onTodayWeatherInfosReady(ArrayList<ArrayList<Object>> temperaturesToday) {
+                try {
+                    for (int i = 0;i < temperaturesToday.size();i++) {
+                        String weatherTodayTimeId = "weatherTodayTime" + (i+1);
+                        String weatherTodaySymbolId = "weatherTodaySymbol" + (i+1);
+                        String weatherTodayTemperatureId = "weatherTodayTemperature" + (i+1);
+
+                        int weatherTodayResID = activity.getResources().getIdentifier(weatherTodayTimeId, "id", activity.getPackageName());
+                        int weatherTodaySymbolResID = activity.getResources().getIdentifier(weatherTodaySymbolId, "id", activity.getPackageName());
+                        int weatherTodayTemperatureResID = activity.getResources().getIdentifier(weatherTodayTemperatureId, "id", activity.getPackageName());
+
+                        TextView weatherTodayTime = activity.findViewById(weatherTodayResID);
+                        ImageView weatherTodaySymbol = activity.findViewById(weatherTodaySymbolResID);
+                        TextView weatherTodayTemperature = activity.findViewById(weatherTodayTemperatureResID);
+
+                        String time = (String) temperaturesToday.get(i).get(0);
+                        String status = (String) temperaturesToday.get(i).get(1);
+                        int temperature = (int) temperaturesToday.get(i).get(2);
+
+                        setCurrentWeatherTimeSymbolTemperature(weatherTodayTime,weatherTodaySymbol,weatherTodayTemperature,time,status,temperature);
+                    }
+                } catch (Exception e) {
+                    Log.d("WeatherApp Debugging",e.getMessage());
+                }
+            }
+
+            @Override
+            public void onWeekWeatherInfosReady(ArrayList<ArrayList<Object>> temperaturesWeek) {
+                try {
+                    for (int i = 0;i < temperaturesWeek.size();i++) {
+                        String weatherWeekTimeId = "weatherWeekTime" + (i+1);
+                        String weatherWeekSymbolId = "weatherWeekSymbol" + (i+1);
+                        String weatherWeekDayTemperatureId = "weatherWeekDayTemperature" + (i+1);
+                        String weatherWeekNightTemperatureId = "weatherWeekNightTemperature" + (i+1);
+
+                        int weatherWeekResID = activity.getResources().getIdentifier(weatherWeekTimeId, "id", activity.getPackageName());
+                        int weatherWeekSymbolResID = activity.getResources().getIdentifier(weatherWeekSymbolId, "id", activity.getPackageName());
+                        int weatherWeekDayTemperatureResID = activity.getResources().getIdentifier(weatherWeekDayTemperatureId, "id", activity.getPackageName());
+                        int weatherWeekNightTemperatureResID = activity.getResources().getIdentifier(weatherWeekNightTemperatureId, "id", activity.getPackageName());
+
+                        TextView weatherWeekTime = activity.findViewById(weatherWeekResID);
+                        ImageView weatherWeekSymbol = activity.findViewById(weatherWeekSymbolResID);
+                        TextView weatherWeekDayTemperature = activity.findViewById(weatherWeekDayTemperatureResID);
+                        TextView weatherWeekNightTemperature = activity.findViewById(weatherWeekNightTemperatureResID);
+
+                        String time = (String) temperaturesWeek.get(i).get(0);
+                        String status = (String) temperaturesWeek.get(i).get(1);
+                        int dayTemperature = (int) temperaturesWeek.get(i).get(2);
+                        int nightTemperature = (int) temperaturesWeek.get(i).get(3);
+
+                        setWeekWeatherTimeSymbolTemperature(weatherWeekTime,weatherWeekSymbol,weatherWeekDayTemperature,weatherWeekNightTemperature,
+                                time,status,dayTemperature,nightTemperature);
+                    }
+                } catch (Exception e) {
+                    Log.d("WeatherApp Debugging",e.getMessage());
+                }
+            }
+
+            @Override
+            public void onBackgroundReady(String weatherStatus) {
+                setAppropriateBackground(weatherStatus);
+            }
+
+            @Override
+            public void onUIReady() {
+                ScrollView scrollView = activity.findViewById(R.id.scrollView);
+                scrollView.setVisibility(View.VISIBLE);
+            }
+            @Override
             public void onError(String message) {
-                Log.e("WeatherApp", "Error: " + message);
-                Toast.makeText(activity, "Error occurred, check log", Toast.LENGTH_LONG).show();
+                Log.e("WeatherApp Debugging", "Error: " + message);
+                Toast.makeText(activity, "Error occurred", Toast.LENGTH_LONG).show();
             }
         });
+    }
+    private void setCurrentTemperature(int temperature) {
+        TextView currentTemperature = activity.findViewById(R.id.currentTemperature);
+        currentTemperature.setText(temperature+"°");
+    }
+    private void setAppropriateWeatherStatus(String weatherStatus) {
+        ImageView weatherStatusTitleSymbol = activity.findViewById(R.id.weatherStatusTitleSymbol);
+        TextView weatherStatusTitle = activity.findViewById(R.id.weatherStatusTitle);
+        switch (weatherStatus) {
+            case "Sunny":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.sunny_weather_status_title_symbol);
+
+                int sunnySymbolSizeInDp = 21;
+                int sunnySymbolTopMarginInDp = 248;
+                int sunnySymbolStartMarginInDp = 226;
+                int sunnyTextStartMarginInDp = 153;
+
+                // Convert to pixels
+                int sunnySymbolSizePx = convertDpIntoPx(sunnySymbolSizeInDp);
+                int sunnySymbolTopMarginPx = convertDpIntoPx(sunnySymbolTopMarginInDp);
+                int sunnySymbolStartMarginPx = convertDpIntoPx(sunnySymbolStartMarginInDp);
+                int sunnyTextStartMargin = convertDpIntoPx(sunnyTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams sunnySymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams sunnyTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                sunnySymbolParams.width = sunnySymbolSizePx;
+                sunnySymbolParams.height = sunnySymbolSizePx;
+
+                // Set margins
+                sunnySymbolParams.topMargin = sunnySymbolTopMarginPx;
+                sunnySymbolParams.leftMargin = sunnySymbolStartMarginPx;
+                sunnyTextParams.leftMargin = sunnyTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(sunnySymbolParams);
+                weatherStatusTitle.setLayoutParams(sunnyTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+            case "Cloudy":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.cloudy_weather_status_title_symbol);
+
+                int cloudySymbolSizeInDp = 30;
+                int cloudySymbolTopMarginInDp = 242;
+                int cloudySymbolStartMarginInDp = 226;
+                int cloudyTextStartMarginInDp = 151;
+
+                // Convert to pixels
+                int cloudySymbolSizePx = convertDpIntoPx(cloudySymbolSizeInDp);
+                int cloudySymbolTopMarginPx = convertDpIntoPx(cloudySymbolTopMarginInDp);
+                int cloudySymbolStartMarginPx = convertDpIntoPx(cloudySymbolStartMarginInDp);
+                int cloudyTextStartMargin = convertDpIntoPx(cloudyTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams cloudySymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams cloudyTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                cloudySymbolParams.width = cloudySymbolSizePx;
+                cloudySymbolParams.height = cloudySymbolSizePx;
+
+                // Set margins
+                cloudySymbolParams.topMargin = cloudySymbolTopMarginPx;
+                cloudySymbolParams.leftMargin = cloudySymbolStartMarginPx;
+                cloudyTextParams.leftMargin = cloudyTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(cloudySymbolParams);
+                weatherStatusTitle.setLayoutParams(cloudyTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+            case "Rainy":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.rainy_weather_status_title_symbol);
+
+                int rainySymbolWidthInDp = 28;
+                int rainySymbolHeightInDp = 31;
+                int rainySymbolTopMarginInDp = 242;
+                int rainySymbolStartMarginInDp = 218;
+                int rainyTextStartMarginInDp = 151;
+
+                // Convert to pixels
+                int rainySymbolWidthPx = convertDpIntoPx(rainySymbolWidthInDp,rainySymbolHeightInDp).x;
+                int rainySymbolHeightPx = convertDpIntoPx(rainySymbolWidthInDp,rainySymbolHeightInDp).y;
+
+                int rainySymbolTopMarginPx = convertDpIntoPx(rainySymbolTopMarginInDp);
+                int rainySymbolStartMarginPx = convertDpIntoPx(rainySymbolStartMarginInDp);
+                int rainyTextStartMargin = convertDpIntoPx(rainyTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams rainySymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams rainyTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                rainySymbolParams.width = rainySymbolWidthPx;
+                rainySymbolParams.height = rainySymbolHeightPx;
+
+                // Set margins
+                rainySymbolParams.topMargin = rainySymbolTopMarginPx;
+                rainySymbolParams.leftMargin = rainySymbolStartMarginPx;
+                rainyTextParams.leftMargin = rainyTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(rainySymbolParams);
+                weatherStatusTitle.setLayoutParams(rainyTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+            case "Stormy":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.stormy_weather_status_title_symbol);
+
+                int stormySymbolWidthInDp = 28;
+                int stormySymbolHeightInDp = 36;
+                int stormySymbolTopMarginInDp = 242;
+                int stormySymbolStartMarginInDp = 225;
+                int stormyTextStartMarginInDp = 147;
+
+                // Convert to pixels
+                int stormySymbolWidthPx = convertDpIntoPx(stormySymbolWidthInDp,stormySymbolHeightInDp).x;
+                int stormySymbolHeightPx = convertDpIntoPx(stormySymbolWidthInDp,stormySymbolHeightInDp).y;
+
+                int stormySymbolTopMarginPx = convertDpIntoPx(stormySymbolTopMarginInDp);
+                int stormySymbolStartMarginPx = convertDpIntoPx(stormySymbolStartMarginInDp);
+                int stormyTextStartMargin = convertDpIntoPx(stormyTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams stormySymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams stormyTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                stormySymbolParams.width = stormySymbolWidthPx;
+                stormySymbolParams.height = stormySymbolHeightPx;
+
+                // Set margins
+                stormySymbolParams.topMargin = stormySymbolTopMarginPx;
+                stormySymbolParams.leftMargin = stormySymbolStartMarginPx;
+                stormyTextParams.leftMargin = stormyTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(stormySymbolParams);
+                weatherStatusTitle.setLayoutParams(stormyTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+            case "Snowy":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.snowy_weather_status_title_symbol);
+
+                int snowySymbolWidthInDp = 31;
+                int snowySymbolHeightInDp = 30;
+                int snowySymbolTopMarginInDp = 242;
+                int snowySymbolStartMarginInDp = 220;
+                int snowyTextStartMarginInDp = 149;
+
+                // Convert to pixels
+                int snowySymbolWidthPx = convertDpIntoPx(snowySymbolWidthInDp,snowySymbolHeightInDp).x;
+                int snowySymbolHeightPx = convertDpIntoPx(snowySymbolWidthInDp,snowySymbolHeightInDp).y;
+
+                int snowySymbolTopMarginPx = convertDpIntoPx(snowySymbolTopMarginInDp);
+                int snowySymbolStartMarginPx = convertDpIntoPx(snowySymbolStartMarginInDp);
+                int snowyTextStartMargin = convertDpIntoPx(snowyTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams snowySymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams snowyTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                snowySymbolParams.width = snowySymbolWidthPx;
+                snowySymbolParams.height = snowySymbolHeightPx;
+
+                // Set margins
+                snowySymbolParams.topMargin = snowySymbolTopMarginPx;
+                snowySymbolParams.leftMargin = snowySymbolStartMarginPx;
+                snowyTextParams.leftMargin = snowyTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(snowySymbolParams);
+                weatherStatusTitle.setLayoutParams(snowyTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+            case "Clear night":
+                weatherStatusTitleSymbol.setImageResource(R.drawable.clear_night_status_title_symbol);
+
+                int nightSymbolWidthInDp = 29;
+                int nightSymbolHeightInDp = 29;
+                int nightSymbolTopMarginInDp = 242;
+                int nightSymbolStartMarginInDp = 244;
+                int nightTextStartMarginInDp = 127;
+
+                // Convert to pixels
+                int nightSymbolWidthPx = convertDpIntoPx(nightSymbolWidthInDp,nightSymbolHeightInDp).x;
+                int nightSymbolHeightPx = convertDpIntoPx(nightSymbolWidthInDp,nightSymbolHeightInDp).y;
+
+                int nightSymbolTopMarginPx = convertDpIntoPx(nightSymbolTopMarginInDp);
+                int nightSymbolStartMarginPx = convertDpIntoPx(nightSymbolStartMarginInDp);
+                int nightTextStartMargin = convertDpIntoPx(nightTextStartMarginInDp);
+
+                // Get layout params and cast to MarginLayoutParams
+                ViewGroup.MarginLayoutParams nightSymbolParams = (ViewGroup.MarginLayoutParams) weatherStatusTitleSymbol.getLayoutParams();
+                ViewGroup.MarginLayoutParams nightTextParams = (ViewGroup.MarginLayoutParams) weatherStatusTitle.getLayoutParams();
+
+                // Set size
+                nightSymbolParams.width = nightSymbolWidthPx;
+                nightSymbolParams.height = nightSymbolHeightPx;
+
+                // Set margins
+                nightSymbolParams.topMargin = nightSymbolTopMarginPx;
+                nightSymbolParams.leftMargin = nightSymbolStartMarginPx;
+                nightTextParams.leftMargin = nightTextStartMargin;
+
+                // Apply updated layout params
+                weatherStatusTitleSymbol.setLayoutParams(nightSymbolParams);
+                weatherStatusTitle.setLayoutParams(nightTextParams);
+
+                weatherStatusTitle.setText(weatherStatus);
+
+                break;
+        }
+    }
+    private void setAirQuality(String quality) {
+        TextView airQualityStatus = activity.findViewById(R.id.airQualityStatus);
+        airQualityStatus.setText(quality);
+    }
+    private void setHumidity(int humidity) {
+        TextView humidityStatus = activity.findViewById(R.id.humidityStatus);
+        humidityStatus.setText(humidity+"%");
+    }
+    private void setCurrentWeatherTimeSymbolTemperature(TextView timeTextView,ImageView weatherSymbol,TextView temperatureTextView
+            ,String time,String status,int temperature) {
+        setWeatherTodayTime(timeTextView,time);
+        setWeatherIcon(weatherSymbol,status);
+        setTemperature(temperatureTextView,temperature,status);
+    }
+    private void setWeekWeatherTimeSymbolTemperature(TextView timeTextView,ImageView weatherSymbol,TextView dayTemperatureTextView
+            ,TextView nightTemperatureTextView,String time,String status,int dayTemperature,int nightTemperature) {
+        setCurrentWeatherTimeSymbolTemperature(timeTextView,weatherSymbol,dayTemperatureTextView,time,status,dayTemperature);
+        setWeekWeatherNightTemperature(nightTemperatureTextView,nightTemperature);
+    }
+    private void setWeekWeatherNightTemperature(TextView nightTemperatureTextView,int nightTemperature) {
+        nightTemperatureTextView.setText(nightTemperature+"°");
+    }
+    private void setAppropriateBackground(String weatherStatus) {
+        ImageView background = activity.findViewById(R.id.bgImage);
+        switch (weatherStatus) {
+            case "Sunny":
+                if (itsMorning()) {
+                    background.setImageResource(R.drawable.sunny_morning_background);
+                } else if (itsDay()) {
+                    background.setImageResource(R.drawable.sunny_day_background);
+                } else if (itsEvening()) {
+                    background.setImageResource(R.drawable.sunny_evening_background);
+                } else if (itsNight()) {
+                    background.setImageResource(R.drawable.clear_night_background);
+                }
+                break;
+            case "Cloudy":
+            case "Rainy":
+                if (itsMorning() || itsDay() || itsEvening()) {
+                    background.setImageResource(R.drawable.rainy_day_background);
+                } else {
+                    background.setImageResource(R.drawable.rainy_night_background);
+                }
+                break;
+            case "Snowy":
+                if (itsMorning()) {
+                    background.setImageResource(R.drawable.snowy_morning_background);
+                } else if (itsDay()){
+                    background.setImageResource(R.drawable.snowy_day_background);
+                } else {
+                    background.setImageResource(R.drawable.snowy_night_background);
+                }
+                break;
+        }
+    }
+
+    private int convertDpIntoPx(int sizeDp) {
+        return (int) (sizeDp * Resources.getSystem().getDisplayMetrics().density + 0.5f);
+    }
+    private Point convertDpIntoPx(int widthDp, int heightDp) {
+        float density = Resources.getSystem().getDisplayMetrics().density;
+        int widthPx = (int) (widthDp * density + 0.5f);
+        int heightPx = (int) (heightDp * density + 0.5f);
+        return new Point(widthPx, heightPx);
+    }
+
+    private void setWeatherTodayTime(TextView timeTextView,String time) {
+        timeTextView.setText(time);
+    }
+    private void setWeatherIcon(ImageView symbol,String status) {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) symbol.getLayoutParams();
+        switch (status) {
+            case "Sunny":
+                symbol.setImageResource(R.drawable.sunny_weather_symbol);
+                params.width = convertDpIntoPx(32);
+                params.height = convertDpIntoPx(32);
+                params.topMargin = convertDpIntoPx(22);
+                break;
+            case "Cloudy":
+                symbol.setImageResource(R.drawable.cloudy_weather_symbol);
+                params.width = convertDpIntoPx(51);
+                params.height = convertDpIntoPx(51);
+                params.topMargin = convertDpIntoPx(11);
+                break;
+            case "Rainy":
+                symbol.setImageResource(R.drawable.rainy_weather_symbol);
+                params.width = convertDpIntoPx(54,60).x;
+                params.height = convertDpIntoPx(54,60).y;
+                params.topMargin = convertDpIntoPx(11);
+                break;
+            case "Stormy":
+                symbol.setImageResource(R.drawable.stormy_weather_symbol);
+                params.width = convertDpIntoPx(54,68).x;
+                params.height = convertDpIntoPx(54,68).y;
+                params.topMargin = convertDpIntoPx(9);
+                break;
+            case "Snowy":
+                symbol.setImageResource(R.drawable.snowy_weather_symbol);
+                params.width = convertDpIntoPx(48,47).x;
+                params.height = convertDpIntoPx(48,47).y;
+                params.topMargin = convertDpIntoPx(13);
+                break;
+            case "Clear night":
+                symbol.setImageResource(R.drawable.clear_night_symbol);
+                params.width = convertDpIntoPx(35);
+                params.height = convertDpIntoPx(35);
+                params.topMargin = convertDpIntoPx(15);
+                break;
+        }
+        symbol.setLayoutParams(params);
+    }
+    private void setTemperature(TextView temperatureTextView,int temperature,String status) {
+        ViewGroup.LayoutParams baseParams = temperatureTextView.getLayoutParams();
+        if (baseParams instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) baseParams;
+
+            switch (status) {
+                case "Sunny":
+                    params.topMargin = convertDpIntoPx(27);
+                    break;
+                case "Cloudy":
+                    params.topMargin = convertDpIntoPx(19);
+                    break;
+                case "Rainy":
+                    params.topMargin = convertDpIntoPx(10);
+                    break;
+                case "Stormy":
+                    params.topMargin = convertDpIntoPx(4);
+                    break;
+                case "Snowy":
+                    params.topMargin = convertDpIntoPx(21);
+                    break;
+            }
+            temperatureTextView.setText(temperature+"°");
+            temperatureTextView.setLayoutParams(params);
+        }
+    }
+
+    private boolean itsMorning() {
+        LocalTime now = LocalTime.now();
+        return !now.isBefore(LocalTime.of(5, 0)) && now.isBefore(LocalTime.of(11, 0));
+    }
+    private boolean itsDay() {
+        LocalTime now = LocalTime.now();
+        return !now.isBefore(LocalTime.of(11, 0)) && now.isBefore(LocalTime.of(16, 0));
+    }
+    private boolean itsEvening() {
+        LocalTime now = LocalTime.now();
+        return !now.isBefore(LocalTime.of(16, 0)) && now.isBefore(LocalTime.of(20, 0));
+    }
+    private boolean itsNight() {
+        LocalTime now = LocalTime.now();
+        return now.isBefore(LocalTime.of(5, 0)) || !now.isBefore(LocalTime.of(20, 0));
     }
 }

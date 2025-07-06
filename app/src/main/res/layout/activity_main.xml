@@ -22,7 +22,8 @@
         android:fillViewport="true"
         android:scrollbars="none"
         android:overScrollMode="never"
-        android:layout_marginBottom="55dp">
+        android:layout_marginBottom="55dp"
+        android:visibility="invisible" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/blurRoot"
@@ -41,8 +42,7 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" />
+                app:layout_constraintTop_toTopOf="parent" />
             <!-- Current location symbol -->
             <ImageView
                 android:id="@+id/currentLocationTitleSymbol"
@@ -53,8 +53,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/current_location_title_symbol"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Temperature -->
             <TextView
@@ -63,13 +62,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="143dp"
                 android:layout_marginTop="132dp"
-                android:text="18°"
                 android:textColor="#FFFFFF"
                 android:textSize="90sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" />
+                app:layout_constraintTop_toTopOf="parent" />
             <!-- Weather Status -->
             <TextView
                 android:id="@+id/weatherStatusTitle"
@@ -77,25 +74,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="153dp"
                 android:layout_marginTop="240dp"
-                android:text="Sunny"
                 android:textColor="#FFFFFF"
                 android:textSize="23sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" />
+                app:layout_constraintTop_toTopOf="parent" />
             <!-- Weather Status Symbol -->
             <ImageView
                 android:id="@+id/weatherStatusTitleSymbol"
                 android:layout_width="21dp"
                 android:layout_height="21dp"
-                android:layout_marginStart="228dp"
+                android:layout_marginStart="226dp"
                 android:layout_marginTop="248dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sunny_weather_status_title_symbol"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Weather Info -->
             <FrameLayout
@@ -106,8 +99,7 @@
                 android:layout_gravity="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="invisible" >
+                app:layout_constraintTop_toTopOf="parent">
 
                 <eightbitlab.com.blurview.BlurView
                     android:id="@+id/weatherInfo"
@@ -126,7 +118,7 @@
                     android:layout_marginStart="24dp" />
 
                 <TextView
-                    android:id="@+id/weatherAirQualityStatus"
+                    android:id="@+id/airQualityStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Status"
@@ -149,10 +141,10 @@
                     android:layout_marginStart="24dp" />
 
                 <TextView
-                    android:id="@+id/weatherHumidity"
+                    android:id="@+id/humidityStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="23%"
+                    android:text=""
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -176,8 +168,7 @@
                 android:layout_marginTop="10dp"
                 app:layout_constraintTop_toBottomOf="@id/weatherInfoContainer"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="invisible" >
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <!-- Background BlurView -->
                 <eightbitlab.com.blurview.BlurView
@@ -206,6 +197,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="now"
@@ -215,13 +207,15 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol1"
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/sunny_weather_symbol"
                                 android:layout_marginTop="19dp" />
 
                             <TextView
-                                android:layout_width="39dp"
+                                android:id="@+id/weatherTodayTemperature1"
+                                android:layout_width="41dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
                                 android:gravity="center"
@@ -239,6 +233,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="00:00"
@@ -248,12 +243,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol2"
                                 android:layout_width="51dp"
                                 android:layout_height="51dp"
                                 android:src="@drawable/cloudy_weather_symbol"
                                 android:layout_marginTop="11dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature2"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -272,6 +269,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="01:00"
@@ -281,12 +279,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol3"
                                 android:layout_width="54dp"
                                 android:layout_height="60dp"
                                 android:src="@drawable/rainy_weather_symbol"
                                 android:layout_marginTop="10dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature3"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
@@ -305,6 +305,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime4"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="02:00"
@@ -314,13 +315,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol4"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
-
+                                android:id="@+id/weatherTodayTemperature4"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
@@ -328,7 +330,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 4 hours -->
                         <LinearLayout
@@ -339,6 +341,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime5"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="03:00"
@@ -348,12 +351,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol5"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature5"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -361,7 +366,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 5 hours -->
                         <LinearLayout
@@ -372,6 +377,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="04:00"
@@ -381,13 +387,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol6"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
-
+                                android:id="@+id/weatherTodayTemperature6"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -395,7 +402,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 6 hours -->
                         <LinearLayout
@@ -406,6 +413,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime7"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="05:00"
@@ -415,13 +423,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol7"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
-
+                                android:id="@+id/weatherTodayTemperature7"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -429,7 +438,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 7 hours -->
                         <LinearLayout
@@ -440,6 +449,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime8"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="06:00"
@@ -449,12 +459,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol8"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature8"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -462,7 +474,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 8 hours -->
                         <LinearLayout
@@ -473,6 +485,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime9"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="07:00"
@@ -482,12 +495,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol9"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature9"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -495,7 +510,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
                         <!-- in 9 hours -->
                         <LinearLayout
@@ -506,6 +521,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime10"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="08:00"
@@ -515,12 +531,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
-                                android:layout_width="54dp"
-                                android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
-                                android:layout_marginTop="9dp" />
+                                android:id="@+id/weatherTodaySymbol10"
+                                android:layout_width="48dp"
+                                android:layout_height="47dp"
+                                android:src="@drawable/snowy_weather_symbol"
+                                android:layout_marginTop="13dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature10"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -528,7 +546,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="21dp" />
                         </LinearLayout>
                         <!-- in 10 hours -->
                         <LinearLayout
@@ -539,6 +557,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherTodayTime11"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="09:00"
@@ -548,12 +567,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherTodaySymbol11"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherTodayTemperature11"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -561,7 +582,7 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
                         </LinearLayout>
 
 
@@ -573,11 +594,12 @@
                 android:id="@+id/weatherWeekContainer"
                 android:layout_width="376dp"
                 android:layout_height="215dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="15dp"
                 app:layout_constraintTop_toBottomOf="@id/weatherTodayContainer"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:visibility="invisible" >
+                app:layout_constraintBottom_toBottomOf="parent" >
 
                 <!-- Background BlurView -->
                 <eightbitlab.com.blurview.BlurView
@@ -606,6 +628,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="today"
@@ -615,12 +638,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol1"
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@drawable/sunny_weather_symbol"
                                 android:layout_marginTop="19dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature1"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
@@ -631,6 +656,7 @@
                                 android:layout_marginTop="29dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature1"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="4°"
@@ -649,6 +675,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Mon"
@@ -658,12 +685,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol2"
                                 android:layout_width="51dp"
                                 android:layout_height="51dp"
                                 android:src="@drawable/cloudy_weather_symbol"
                                 android:layout_marginTop="11dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature2"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -674,6 +703,7 @@
                                 android:layout_marginTop="19dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature2"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="1°"
@@ -693,6 +723,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Tue"
@@ -702,12 +733,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol3"
                                 android:layout_width="54dp"
                                 android:layout_height="60dp"
                                 android:src="@drawable/rainy_weather_symbol"
                                 android:layout_marginTop="10dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature3"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
@@ -718,6 +751,7 @@
                                 android:layout_marginTop="11dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature3"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -736,6 +770,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime4"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Wed"
@@ -745,12 +780,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol4"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature4"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-18°"
@@ -758,9 +795,10 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature4"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -768,7 +806,7 @@
                                 android:textColor="#75FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="10dp" />
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
                         <!-- in 4 days -->
                         <LinearLayout
@@ -779,6 +817,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime5"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Thu"
@@ -788,12 +827,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol5"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature5"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -801,9 +842,10 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature5"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -811,7 +853,7 @@
                                 android:textColor="#75FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="10dp" />
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
                         <!-- in 5 days -->
                         <LinearLayout
@@ -822,6 +864,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Fri"
@@ -831,12 +874,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol6"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature6"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -844,9 +889,10 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature6"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -854,7 +900,7 @@
                                 android:textColor="#75FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="10dp" />
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
                         <!-- in 6 days -->
                         <LinearLayout
@@ -865,6 +911,7 @@
                             android:gravity="center_horizontal">
 
                             <TextView
+                                android:id="@+id/weatherWeekTime7"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Sat"
@@ -874,12 +921,14 @@
                                 android:layout_marginTop="25dp" />
 
                             <ImageView
+                                android:id="@+id/weatherWeekSymbol7"
                                 android:layout_width="54dp"
                                 android:layout_height="68dp"
-                                android:src="@drawable/thunder_symbol"
+                                android:src="@drawable/stormy_weather_symbol"
                                 android:layout_marginTop="9dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekDayTemperature7"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="8°"
@@ -887,9 +936,10 @@
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="2dp" />
+                                android:layout_marginTop="4dp" />
 
                             <TextView
+                                android:id="@+id/weatherWeekNightTemperature7"
                                 android:layout_width="39dp"
                                 android:layout_height="wrap_content"
                                 android:text="-8°"
@@ -897,7 +947,7 @@
                                 android:textColor="#75FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
-                                android:layout_marginTop="10dp" />
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
 
                     </LinearLayout>
