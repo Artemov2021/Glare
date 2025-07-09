@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui;
+package com.example.glare.ui;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
@@ -17,8 +16,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,35 +23,29 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.net.Network;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.weatherapp.R;
-import com.example.weatherapp.data.Weather;
+import com.example.glare.R;
+import com.example.glare.data.Weather;
 
 import org.threeten.bp.LocalTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 import eightbitlab.com.blurview.BlurView;
 
 public class WeatherUI {
-    private static final int PERMISSIONS_REQUEST_CODE = 123;
+    ImageView connectionSymbol;
     private ObjectAnimator rotationAnimator;
+    private ObjectAnimator locationRotationAnimator;
     private ActivityResultLauncher<Intent> permissionSettingsLauncher;
     private static final String[] REQUIRED_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -63,7 +54,8 @@ public class WeatherUI {
     };
     private Activity activity;
     private Window window;
-
+    private float translationY = 0;
+    private boolean isWeatherUIReloading = false;
 
     public WeatherUI(Activity activity) {
         this.activity = activity;
@@ -117,7 +109,14 @@ public class WeatherUI {
         FrameLayout noInternetFrameLayout = activity.findViewById(R.id.noInternetFrameLayout);
         noInternetFrameLayout.setVisibility(View.INVISIBLE);
     }
+    private void hideErrorUI() {
+        FrameLayout errorFrameLayout = activity.findViewById(R.id.errorFrameLayout);
+        errorFrameLayout.setVisibility(View.INVISIBLE);
+    }
     private void setNoInternetUI() {
+        ImageView background = activity.findViewById(R.id.bgImage);
+        background.setImageResource(R.drawable.sunny_morning_background);
+
         FrameLayout noInternetFrameLayout = activity.findViewById(R.id.noInternetFrameLayout);
         BlurView noInternetBlurView = activity.findViewById(R.id.noInternetBlurView);
         ImageView tryAgainButton = activity.findViewById(R.id.tryAgainButton);
@@ -130,6 +129,7 @@ public class WeatherUI {
         setTryAgainButtonPressedEffect(tryAgainButton,noInternetFrameLayout);
     }
     private void setAppropriateUI() {
+
         setPullToRefreshListener();
         setBluredInfo();
 
@@ -137,6 +137,9 @@ public class WeatherUI {
     }
     public void setNoPermissionsUI() {
         // set frame layout blur effect, visibility -> true
+        ImageView background = activity.findViewById(R.id.bgImage);
+        background.setImageResource(R.drawable.sunny_morning_background);
+
         FrameLayout permissionFrameLayout = activity.findViewById(R.id.permissionFrameLayout);
         BlurView permissionBlurView = activity.findViewById(R.id.permissionBlurView);
         ImageView permissionButton = activity.findViewById(R.id.permissionButton);
@@ -147,6 +150,24 @@ public class WeatherUI {
 
         permissionFrameLayout.setVisibility(View.VISIBLE);
         setPermissionButtonPressedEffect(permissionButton);
+    }
+    private void setErrorUI() {
+        ScrollView scrollView = activity.findViewById(R.id.scrollView);
+        scrollView.setVisibility(View.INVISIBLE);
+
+        ImageView background = activity.findViewById(R.id.bgImage);
+        background.setImageResource(R.drawable.sunny_morning_background);
+
+        FrameLayout errorFrameLayout = activity.findViewById(R.id.errorFrameLayout);
+        BlurView errorBlurView = activity.findViewById(R.id.errorBlurView);
+        ImageView errorTryAgainButton = activity.findViewById(R.id.errorTryAgainButton);
+        ViewGroup rootLayout = activity.findViewById(R.id.blurTarget);
+
+        BlurInitializer.initBlurView(activity,errorBlurView, rootLayout, 20f, 23f);
+        BlurInitializer.setStroke(errorBlurView, 0.4f, Color.WHITE, 0.5f);
+
+        errorFrameLayout.setVisibility(View.VISIBLE);
+        setTryAgainButtonPressedEffect(errorTryAgainButton,errorFrameLayout);
     }
 
 
@@ -211,7 +232,7 @@ public class WeatherUI {
 
     private void addReconnectingAnimation(FrameLayout noInternetFramelayout) {
         // Create ImageView and set image
-        ImageView connectionSymbol = new ImageView(activity);
+        connectionSymbol = new ImageView(activity);
         connectionSymbol.setImageResource(R.drawable.reconnecting_button_symbol);
 
         // Convert dp to pixels
@@ -229,9 +250,6 @@ public class WeatherUI {
         params.topMargin = marginTopPx;
         params.setMarginStart(marginStartPx);  // Requires API 17+
 
-        // Optional: set gravity if needed (e.g., top-left by default)
-        // params.gravity = Gravity.TOP | Gravity.START;
-
         connectionSymbol.setLayoutParams(params);
         noInternetFramelayout.addView(connectionSymbol);
 
@@ -242,11 +260,22 @@ public class WeatherUI {
         rotationAnimator.setRepeatCount(ObjectAnimator.INFINITE);
         rotationAnimator.start();
     }
+    private void setNormalTryAgainButton() {
+        FrameLayout errorFrameLayout = activity.findViewById(R.id.errorFrameLayout);
+        ImageView errorTryAgainButton = activity.findViewById(R.id.errorTryAgainButton);
+
+        errorFrameLayout.removeView(connectionSymbol);
+
+        errorTryAgainButton.setImageResource(R.drawable.try_again_button);
+        errorTryAgainButton.setEnabled(true);
+    }
     private void tryReconnect() {
         if (isInternetAvailable()) {
             stopReconnectingAnimation();
-            setAppropriateUI();
             hideNoInternetUI();
+            hideErrorUI();
+            setAppropriateUI();
+            setNormalTryAgainButton();
         } else {
             // Optionally, use a handler to retry after a delay
             new Handler().postDelayed(new Runnable() {
@@ -327,7 +356,7 @@ public class WeatherUI {
                         float deltaY = currentY - startY;
 
                         if (deltaY > 0) {  // dragging down only
-                            float translationY = Math.min(deltaY / 2, maxPullDistance); // dampen drag by half
+                            translationY = Math.min(deltaY / 2, maxPullDistance); // dampen drag by half
                             scrollView.setTranslationY(translationY);
                             return true;  // consume event, prevent scrollView from scrolling
                         }
@@ -344,6 +373,13 @@ public class WeatherUI {
                                     .start();
 
                             dragging = false;
+
+                            if (!isWeatherUIReloading && translationY > 150) {
+                                isWeatherUIReloading = true;
+                                setLocationSymbolLoading();
+                                reloadWeatherUI();
+                            }
+
                             return true;
                         }
                         break;
@@ -408,10 +444,11 @@ public class WeatherUI {
                         String status = (String) temperaturesToday.get(i).get(1);
                         int temperature = (int) temperaturesToday.get(i).get(2);
 
-                        setCurrentWeatherTimeSymbolTemperature(weatherTodayTime,weatherTodaySymbol,weatherTodayTemperature,time,status,temperature);
+                        setCurrentWeatherTimeSymbolTemperature(weatherTodayTime,weatherTodaySymbol,weatherTodayTemperature,time,status,temperature,"today");
                     }
                 } catch (Exception e) {
-                    Log.d("WeatherApp Debugging",e.getMessage());
+                    stopReconnectingAnimation();
+                    setErrorUI();
                 }
             }
 
@@ -443,7 +480,8 @@ public class WeatherUI {
                                 time,status,dayTemperature,nightTemperature);
                     }
                 } catch (Exception e) {
-                    Log.d("WeatherApp Debugging",e.getMessage());
+                    stopReconnectingAnimation();
+                    setErrorUI();
                 }
             }
 
@@ -456,11 +494,20 @@ public class WeatherUI {
             public void onUIReady() {
                 ScrollView scrollView = activity.findViewById(R.id.scrollView);
                 scrollView.setVisibility(View.VISIBLE);
+
+                if (isWeatherUIReloading) {
+                    // Keep the loading symbol visible for at least 1.5 seconds
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        isWeatherUIReloading = false;
+                        stopLocationSymbolRotation();
+                        setNormalLocationSymbol();
+                    }, 1200); // 1500 ms = 1.5 seconds
+                }
             }
             @Override
             public void onError(String message) {
-                Log.e("WeatherApp Debugging", "Error: " + message);
-                Toast.makeText(activity, "Error occurred", Toast.LENGTH_LONG).show();
+                stopReconnectingAnimation();
+                setErrorUI();
             }
         });
     }
@@ -477,7 +524,7 @@ public class WeatherUI {
 
                 int sunnySymbolSizeInDp = 21;
                 int sunnySymbolTopMarginInDp = 248;
-                int sunnySymbolStartMarginInDp = 226;
+                int sunnySymbolStartMarginInDp = 223;
                 int sunnyTextStartMarginInDp = 153;
 
                 // Convert to pixels
@@ -699,14 +746,14 @@ public class WeatherUI {
         humidityStatus.setText(humidity+"%");
     }
     private void setCurrentWeatherTimeSymbolTemperature(TextView timeTextView,ImageView weatherSymbol,TextView temperatureTextView
-            ,String time,String status,int temperature) {
+            ,String time,String status,int temperature,String block) {
         setWeatherTodayTime(timeTextView,time);
-        setWeatherIcon(weatherSymbol,status);
+        setWeatherIcon(weatherSymbol,status,block);
         setTemperature(temperatureTextView,temperature,status);
     }
     private void setWeekWeatherTimeSymbolTemperature(TextView timeTextView,ImageView weatherSymbol,TextView dayTemperatureTextView
             ,TextView nightTemperatureTextView,String time,String status,int dayTemperature,int nightTemperature) {
-        setCurrentWeatherTimeSymbolTemperature(timeTextView,weatherSymbol,dayTemperatureTextView,time,status,dayTemperature);
+        setCurrentWeatherTimeSymbolTemperature(timeTextView,weatherSymbol,dayTemperatureTextView,time,status,dayTemperature,"week");
         setWeekWeatherNightTemperature(nightTemperatureTextView,nightTemperature);
     }
     private void setWeekWeatherNightTemperature(TextView nightTemperatureTextView,int nightTemperature) {
@@ -759,7 +806,7 @@ public class WeatherUI {
     private void setWeatherTodayTime(TextView timeTextView,String time) {
         timeTextView.setText(time);
     }
-    private void setWeatherIcon(ImageView symbol,String status) {
+    private void setWeatherIcon(ImageView symbol,String status,String block) {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) symbol.getLayoutParams();
         switch (status) {
             case "Sunny":
@@ -793,11 +840,19 @@ public class WeatherUI {
                 params.topMargin = convertDpIntoPx(13);
                 break;
             case "Clear night":
-                symbol.setImageResource(R.drawable.clear_night_symbol);
-                params.width = convertDpIntoPx(35);
-                params.height = convertDpIntoPx(35);
-                params.topMargin = convertDpIntoPx(15);
-                break;
+                if (block.equals("today")) {
+                    symbol.setImageResource(R.drawable.clear_night_symbol);
+                    params.width = convertDpIntoPx(35);
+                    params.height = convertDpIntoPx(35);
+                    params.topMargin = convertDpIntoPx(22);
+                    break;
+                } else {
+                    symbol.setImageResource(R.drawable.sunny_weather_symbol);
+                    params.width = convertDpIntoPx(32);
+                    params.height = convertDpIntoPx(32);
+                    params.topMargin = convertDpIntoPx(22);
+                    break;
+                }
         }
         symbol.setLayoutParams(params);
     }
@@ -822,6 +877,9 @@ public class WeatherUI {
                 case "Snowy":
                     params.topMargin = convertDpIntoPx(21);
                     break;
+                case "Clear night":
+                    params.topMargin = convertDpIntoPx(24);
+                    break;
             }
             temperatureTextView.setText(temperature+"°");
             temperatureTextView.setLayoutParams(params);
@@ -843,5 +901,56 @@ public class WeatherUI {
     private boolean itsNight() {
         LocalTime now = LocalTime.now();
         return now.isBefore(LocalTime.of(5, 0)) || !now.isBefore(LocalTime.of(20, 0));
+    }
+
+    private void reloadWeatherUI() {
+        setWeatherValues();
+    }
+    private void setLocationSymbolLoading() {
+        ImageView locationSymbol = activity.findViewById(R.id.currentLocationTitleSymbol);
+        locationSymbol.setImageResource(R.drawable.current_location_loading_title_symbol);
+
+        // Convert 15dp to px for size
+        int sizeInPx = convertDpIntoPx(14);
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) locationSymbol.getLayoutParams();
+        params.width = sizeInPx;
+        params.height = sizeInPx;
+
+        // Convert 10dp to px for top margin
+        int topMarginInPx = convertDpIntoPx(53);
+        params.topMargin = topMarginInPx;
+
+        locationSymbol.setLayoutParams(params);
+
+        // Start rotating animation
+        locationRotationAnimator = ObjectAnimator.ofFloat(locationSymbol, "rotation", 0f, 360f);
+        locationRotationAnimator.setDuration(1000); // 1 second per rotation
+        locationRotationAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+        locationRotationAnimator.setInterpolator(new LinearInterpolator());
+        locationRotationAnimator.start();
+    }
+    private void stopLocationSymbolRotation() {
+        if (locationRotationAnimator != null && locationRotationAnimator.isRunning()) {
+            locationRotationAnimator.cancel();
+            locationRotationAnimator = null;
+
+            // Reset rotation in case you want the image to be upright
+            ImageView locationSymbol = activity.findViewById(R.id.currentLocationTitleSymbol);
+            locationSymbol.setRotation(0f);
+        }
+    }
+    private void setNormalLocationSymbol() {
+        ImageView locationSymbol = activity.findViewById(R.id.currentLocationTitleSymbol);
+        locationSymbol.setImageResource(R.drawable.current_location_title_symbol);
+
+        int sizeInPx = convertDpIntoPx(18);
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) locationSymbol.getLayoutParams();
+        params.width = sizeInPx;
+        params.height = sizeInPx;
+
+        int topMarginInPx = convertDpIntoPx(51);
+        params.topMargin = topMarginInPx;
+
+        locationSymbol.setLayoutParams(params);
     }
 }

@@ -11,8 +11,7 @@
         android:id="@+id/bgImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/sunny_morning_background" />
+        android:scaleType="centerCrop" />
 
     <!-- 🔹 Scrollable content over background -->
     <ScrollView
@@ -37,7 +36,7 @@
                 android:layout_height="33dp"
                 android:layout_marginStart="147dp"
                 android:layout_marginTop="48dp"
-                android:text="current location"
+                android:text="Current location"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold"
@@ -1085,6 +1084,53 @@
         <!-- Button with blur background -->
         <ImageView
             android:id="@+id/tryAgainButton"
+            android:layout_width="310dp"
+            android:layout_height="53dp"
+            android:src="@drawable/try_again_button"
+            android:contentDescription="Custom Button"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="111dp"
+            android:clickable="true"
+            android:focusable="true" >
+
+        </ImageView>
+
+
+
+
+    </FrameLayout>
+
+    <!-- 🔹 No Intenet Message Overlay -->
+    <FrameLayout
+        android:id="@+id/errorFrameLayout"
+        android:layout_width="336dp"
+        android:layout_height="177dp"
+        android:layout_marginTop="340dp"
+        android:layout_gravity="top|center_horizontal"
+        android:visibility="invisible" >
+
+        <eightbitlab.com.blurview.BlurView
+            android:id="@+id/errorBlurView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- To show you weather,... -->
+        <TextView
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:text="Oops! Something went wrong while loading the weather data"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp" >
+
+        </TextView>
+
+        <!-- Button with blur background -->
+        <ImageView
+            android:id="@+id/errorTryAgainButton"
             android:layout_width="310dp"
             android:layout_height="53dp"
             android:src="@drawable/try_again_button"

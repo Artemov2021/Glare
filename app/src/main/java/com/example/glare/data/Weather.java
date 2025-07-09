@@ -1,4 +1,4 @@
-package com.example.weatherapp.data;
+package com.example.glare.data;
 
 import android.Manifest;
 import android.app.Activity;
@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.glare.BuildConfig;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -25,18 +26,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import org.threeten.bp.LocalDate;
-import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.LocalTime;
-import org.threeten.bp.ZoneId;
-import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.format.DateTimeFormatter;
-import org.threeten.bp.temporal.ChronoUnit;
+
 
 public class Weather {
     public interface WeatherCallback {
@@ -86,7 +81,7 @@ public class Weather {
     private static void fetchVisualCrossingWeatherAsync(double lat, double lon, WeatherCallback callback) {
         new Thread(() -> {
             try {
-                String apiKey = "N97WSHTK7Z72BLNM4LVKUDKJX";
+                String apiKey = BuildConfig.WEATHER_API_KEY;
 
                 LocalDate today = LocalDate.now();
                 LocalDate sevenDaysLater = today.plusDays(6); // total 7 days incl. today
@@ -104,7 +99,6 @@ public class Weather {
                 String currentStatus = mapCondition(current.getString("conditions"));
 
                 JSONArray days = jsonObj.getJSONArray("days");
-                Log.e("WeatherApp Debugging",days.toString());
 
 
                 ArrayList<ArrayList<Object>> nextHours = new ArrayList<>();
@@ -195,6 +189,7 @@ public class Weather {
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     callback.onBackgroundReady(currentStatus);
+
                     callback.onTemperatureReady(currentTemp);
                     callback.onHumidityReady(humidity);
                     callback.onWeatherStatusReady(currentStatus);
@@ -213,7 +208,7 @@ public class Weather {
         new Thread(() -> {
             try {
                 String urlString = "https://api.openweathermap.org/data/2.5/air_pollution?lat=" + lat + "&lon=" + lon +
-                        "&appid=b7e9ba5dcd023a261c61d7a0805a39c9";
+                        "&appid=" + BuildConfig.OPENWEATHER_API_KEY;
 
                 URL url = new URL(urlString);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();

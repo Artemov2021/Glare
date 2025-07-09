@@ -1,37 +1,15 @@
-package com.example.weatherapp;
+package com.example.glare;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Outline;
-import android.graphics.RenderEffect;
-import android.graphics.Shader;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
-import android.view.Window;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.weatherapp.ui.BlurInitializer;
-import com.example.weatherapp.ui.WeatherUI;
+import com.example.glare.ui.WeatherUI;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 

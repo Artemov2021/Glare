@@ -1,24 +1,42 @@
+import java.util.Properties
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+val crossingVisualApi: String = localProperties.getProperty("VISUAL_CROSSING_API_KEY") ?: ""
+val openWeatherApiKey: String = localProperties.getProperty("OPENWEATHER_API_KEY") ?: ""
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
 android {
-    namespace = "com.example.weatherapp"
+    buildFeatures {
+        buildConfig = true
+    }
+
+    namespace = "com.example.glare"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.weatherapp"
+        applicationId = "com.example.glare"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "WEATHER_API_KEY", "\"$crossingVisualApi\"")
+        buildConfigField("String", "OPENWEATHER_API_KEY", "\"$openWeatherApiKey\"")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

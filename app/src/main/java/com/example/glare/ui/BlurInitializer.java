@@ -1,4 +1,4 @@
-package com.example.weatherapp.ui;
+package com.example.glare.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
