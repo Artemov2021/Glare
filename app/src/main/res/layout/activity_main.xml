@@ -57,7 +57,7 @@
             <!-- Temperature -->
             <TextView
                 android:id="@+id/currentTemperature"
-                android:layout_width="150dp"
+                android:layout_width="175dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="143dp"
                 android:layout_marginTop="132dp"

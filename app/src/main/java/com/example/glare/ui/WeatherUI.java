@@ -513,6 +513,18 @@ public class WeatherUI {
     }
     private void setCurrentTemperature(int temperature) {
         TextView currentTemperature = activity.findViewById(R.id.currentTemperature);
+        ViewGroup.LayoutParams baseParams = currentTemperature.getLayoutParams();
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) baseParams;
+
+        byte temperatureSize = (byte) String.valueOf(temperature).length();
+        if (temperatureSize == 1) {
+            params.leftMargin = convertDpIntoPx(160);
+        } else if (temperatureSize == 2) {
+            params.leftMargin = convertDpIntoPx(137);
+        } else if (temperatureSize == 3) {
+            params.leftMargin = convertDpIntoPx(115);
+        }
+        currentTemperature.setLayoutParams(params);
         currentTemperature.setText(temperature+"°");
     }
     private void setAppropriateWeatherStatus(String weatherStatus) {
