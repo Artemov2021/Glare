@@ -13,7 +13,7 @@ This app retrieves weather information using the following APIs:
 
 - [**Visual Crossing Weather API**](https://www.visualcrossing.com/)  
 
-- [**OpenWeatherMap API**](https://openweathermap.org/api)
+- [**OpenWeatherMap API**](https://openweathermap.org)
 
 ## 🧭 Location Permission
 
